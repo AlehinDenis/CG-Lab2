@@ -19,10 +19,32 @@ namespace CG_lab2
         bool loaded = false;
         View view = new View();
         int currentLayer;
+        int FrameCount = 0;
+        DateTime NextFPSUpdate = DateTime.Now.AddSeconds(1);
 
         public Form1()
         {
             InitializeComponent();
+        }
+
+        void Application_Idle(object sender, EventArgs e)
+        {
+            while (glControl.IsIdle)
+            {
+                displayFPS();
+                glControl.Invalidate();
+            }
+        }
+
+        void displayFPS()
+        {
+            if(DateTime.Now>=NextFPSUpdate)
+            {
+                this.Text = String.Format("CT Visualizer (fps={0})", FrameCount);
+                NextFPSUpdate = DateTime.Now.AddSeconds(1);
+                FrameCount = 0;
+            }
+            FrameCount++;
         }
 
         private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
@@ -39,11 +61,19 @@ namespace CG_lab2
             }
         }
 
-        private void glControl1_Paint(object sender, PaintEventArgs e = null)
+
+        bool needReload = false;
+        private void glControl1_Paint(object sender, PaintEventArgs e)
         {
             if (loaded)
             {
-                view.DrawQuads(currentLayer);
+                if(needReload)
+                {
+                    view.generateTextureImage(currentLayer);
+                    view.Load2DTexture();
+                    needReload = false;
+                }
+                view.DrawTexture();
                 glControl.SwapBuffers();
             }
         }
@@ -51,7 +81,12 @@ namespace CG_lab2
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             currentLayer = trackBar1.Value;
-            glControl1_Paint(this);
+            needReload = true;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            Application.Idle += Application_Idle;
         }
     }
 }
