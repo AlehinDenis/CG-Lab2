@@ -58,6 +58,7 @@ namespace CG_lab2
                 loaded = true;
                 glControl.Invalidate();
                 trackBar1.Maximum = Bin.Z - 1;
+                glControl1_Paint(this, null);
             }
         }
 
@@ -67,13 +68,16 @@ namespace CG_lab2
         {
             if (loaded)
             {
-                if(needReload)
-                {
-                    view.generateTextureImage(currentLayer);
-                    view.Load2DTexture();
-                    needReload = false;
-                }
-                view.DrawTexture();
+                if(checkBox.Checked)
+                    if(needReload)
+                    {
+                        view.generateTextureImage(currentLayer);
+                        view.Load2DTexture();
+                        needReload = false;
+                    }
+                    view.DrawTexture();
+                if (!checkBox.Checked)
+                    view.DrawQuads(currentLayer);
                 glControl.SwapBuffers();
             }
         }
