@@ -102,37 +102,52 @@ namespace CG_lab2
         public void DrawQuads(int min, int width, int layerNumber)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.Begin(BeginMode.Quads);
+            GL.Begin(BeginMode.QuadStrip);
 
+            int y_coord = 0;
             for (int x_coord = 0; x_coord < Bin.X - 1; x_coord++)
-                for (int y_coord = 0; y_coord < Bin.Y - 1; y_coord++)
+            {
+                if (y_coord == 0)
                 {
-                    short value;
+                    while (y_coord != Bin.X - 1)
+                    {
+                        short value;
+                        // 1 вершина
+                        value = Bin.array[x_coord + y_coord * Bin.X
+                            + layerNumber * Bin.X * Bin.Y];
+                        GL.Color3(TransferFunction(min, width, value));
+                        GL.Vertex2(x_coord, y_coord);
 
-                    // 1 вершина
-                    value = Bin.array[x_coord + y_coord * Bin.X
-                        + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(min, width, value));
-                    GL.Vertex2(x_coord, y_coord);
-
-                    // 2 вершина
-                    value = Bin.array[x_coord + (y_coord + 1) * Bin.X
-                        + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(min, width, value));
-                    GL.Vertex2(x_coord, y_coord + 1);
-
-                    // 3 вершина
-                    value = Bin.array[(x_coord + 1) + (y_coord + 1) * Bin.X
-                        + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(min, width, value));
-                    GL.Vertex2(x_coord + 1, y_coord + 1);
-
-                    // 4 вершина
-                    value = Bin.array[(x_coord + 1) + y_coord * Bin.X
-                        + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(min, width, value));
-                    GL.Vertex2(x_coord + 1, y_coord);
+                        // 2 вершина
+                        value = Bin.array[(x_coord + 1) + y_coord * Bin.X
+                            + layerNumber * Bin.X * Bin.Y];
+                        GL.Color3(TransferFunction(min, width, value));
+                        GL.Vertex2(x_coord + 1, y_coord);
+                        y_coord++;
+                    }
+                    continue;
                 }
+                if (y_coord == Bin.X - 1)
+                {
+                    while (y_coord != 0)
+                    {
+                        short value;
+                        // 1 вершина
+                        value = Bin.array[x_coord + y_coord * Bin.X
+                            + layerNumber * Bin.X * Bin.Y];
+                        GL.Color3(TransferFunction(min, width, value));
+                        GL.Vertex2(x_coord, y_coord);
+
+                        // 2 вершина
+                        value = Bin.array[(x_coord + 1) + y_coord * Bin.X
+                            + layerNumber * Bin.X * Bin.Y];
+                        GL.Color3(TransferFunction(min, width, value));
+                        GL.Vertex2(x_coord + 1, y_coord);
+                        y_coord--;
+                    }
+                    continue;
+                }
+            }
         }
     }
 }
