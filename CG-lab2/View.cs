@@ -16,14 +16,14 @@ namespace CG_lab2
         Bitmap textureImage;
         int VBOtexture;
 
-        public void generateTextureImage(int layerNumber)
+        public void generateTextureImage(int min, int width, int layerNumber)
         {
             textureImage = new Bitmap(Bin.X, Bin.Y);
             for(int i = 0; i < Bin.X; i++)
                 for(int j = 0; j < Bin.Y; j++)
                 {
                     int pixelNumber = i + j * Bin.X + layerNumber * Bin.X * Bin.Y;
-                    textureImage.SetPixel(i, j, TransferFunction(Bin.array[pixelNumber]));
+                    textureImage.SetPixel(i, j, TransferFunction(min, width, Bin.array[pixelNumber]));
                 }
         }
 
@@ -89,15 +89,17 @@ namespace CG_lab2
             return value;
         }
 
-        Color TransferFunction(short value)
+        Color TransferFunction(int Min, int width, short value)
         {
-            int min = 0;
-            int max = 2000;
+            int min = Min;
+            int max = min + width;
+            if ((max - min) == 0)
+                max = 1;
             int newVal = Clamp((value - min) * 255 / (max - min), 0, 255);
             return Color.FromArgb(255, newVal, newVal, newVal);
         }
 
-        public void DrawQuads(int layerNumber)
+        public void DrawQuads(int min, int width, int layerNumber)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.Begin(BeginMode.Quads);
@@ -110,25 +112,25 @@ namespace CG_lab2
                     // 1 вершина
                     value = Bin.array[x_coord + y_coord * Bin.X
                         + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(value));
+                    GL.Color3(TransferFunction(min, width, value));
                     GL.Vertex2(x_coord, y_coord);
 
                     // 2 вершина
                     value = Bin.array[x_coord + (y_coord + 1) * Bin.X
                         + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(value));
+                    GL.Color3(TransferFunction(min, width, value));
                     GL.Vertex2(x_coord, y_coord + 1);
 
                     // 3 вершина
                     value = Bin.array[(x_coord + 1) + (y_coord + 1) * Bin.X
                         + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(value));
+                    GL.Color3(TransferFunction(min, width, value));
                     GL.Vertex2(x_coord + 1, y_coord + 1);
 
                     // 4 вершина
                     value = Bin.array[(x_coord + 1) + y_coord * Bin.X
                         + layerNumber * Bin.X * Bin.Y];
-                    GL.Color3(TransferFunction(value));
+                    GL.Color3(TransferFunction(min, width, value));
                     GL.Vertex2(x_coord + 1, y_coord);
                 }
         }

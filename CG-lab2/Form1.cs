@@ -18,7 +18,9 @@ namespace CG_lab2
         Bin bin = new Bin();
         bool loaded = false;
         View view = new View();
-        int currentLayer;
+        int currentLayer = 0;
+        int currentMin = 1;
+        int currentWidth = 2000;
         int FrameCount = 0;
         DateTime NextFPSUpdate = DateTime.Now.AddSeconds(1);
 
@@ -58,7 +60,6 @@ namespace CG_lab2
                 loaded = true;
                 glControl.Invalidate();
                 trackBar1.Maximum = Bin.Z - 1;
-                glControl1_Paint(this, null);
             }
         }
 
@@ -68,16 +69,18 @@ namespace CG_lab2
         {
             if (loaded)
             {
-                if(checkBox.Checked)
-                    if(needReload)
+                if (checkBox.Checked)
+                {
+                    if (needReload)
                     {
-                        view.generateTextureImage(currentLayer);
+                        view.generateTextureImage(currentMin, currentWidth, currentLayer);
                         view.Load2DTexture();
                         needReload = false;
                     }
                     view.DrawTexture();
-                if (!checkBox.Checked)
-                    view.DrawQuads(currentLayer);
+                }
+                else
+                    view.DrawQuads(currentMin, currentWidth, currentLayer);
                 glControl.SwapBuffers();
             }
         }
@@ -91,6 +94,18 @@ namespace CG_lab2
         private void Form1_Load(object sender, EventArgs e)
         {
             Application.Idle += Application_Idle;
+        }
+
+        private void trackBar2_Scroll(object sender, EventArgs e)
+        {
+            currentMin = trackBar2.Value;
+            needReload = true;
+        }
+
+        private void trackBar3_Scroll(object sender, EventArgs e)
+        {
+            currentWidth = trackBar3.Value;
+            needReload = true;
         }
     }
 }
